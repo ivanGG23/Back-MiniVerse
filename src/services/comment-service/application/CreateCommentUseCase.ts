@@ -1,6 +1,9 @@
 import { ICommentRepository, CreateCommentDTO } from "../domain/repositories/ICommentRepository";
 import { Comment } from "../domain/entities/Comment";
 
+const REALTIME_SERVICE_URL =
+  process.env.REALTIME_SERVICE_URL || "http://localhost:3008";
+
 export class CreateCommentUseCase {
   constructor(private readonly commentRepository: ICommentRepository) {}
 
@@ -11,7 +14,29 @@ export class CreateCommentUseCase {
     if (data.contenido.trim().length < 2) {
       throw new Error("El comentario debe tener al menos 2 caracteres");
     }
-    return this.commentRepository.create(data);
+
+    // 1. Guardar en DB
+    const comentario = await this.commentRepository.create(data);
+
+    // 2. Notificar al realtime-service (sin bloquear la respuesta)
+    fetch(`${REALTIME_SERVICE_URL}/emit/comment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        idResena: data.idResena,
+        comentario: {
+          id: comentario.id,
+          contenido: comentario.contenido,
+          fechaCreacion: comentario.fechaCreacion,
+          idUsuario: comentario.idUsuario,
+          idResena: comentario.idResena,
+        },
+      }),
+    }).catch((err) =>
+      console.error("Error notificando al realtime-service:", err)
+    );
+
+    return comentario;
   }
 }
 
