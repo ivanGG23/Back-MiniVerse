@@ -1,0 +1,25 @@
+{
+  "name": "user-service",
+  "version": "1.0.0",
+  "description": "MiniVerse - User Service",
+  "scripts": {
+    "dev": "ts-node-dev --respawn main.ts",
+    "build": "tsc",
+    "prisma:generate": "prisma generate --schema=prisma/schema.prisma",
+    "prisma:push": "prisma db push --schema=prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.0.0",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.0",
+    "jsonwebtoken": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.0",
+    "@types/jsonwebtoken": "^9.0.0",
+    "@types/node": "^20.0.0",
+    "prisma": "^5.0.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.0"
+  }
+}
