@@ -48,6 +48,19 @@ model Serie {
   imagenUrl  String?  @db.VarChar(255) @map("imagen_url")
   genero     Genero   @relation(fields: [idGenero], references: [id])
   director   Director @relation(fields: [idDirector], references: [id])
+  temporadas Temporada[]
 
   @@map("serie")
+}
+
+model Temporada {
+  id          Int     @id @default(autoincrement())
+  numero      Int
+  nombre      String  @db.VarChar(150)
+  descripcion String? @db.Text
+  imagenUrl   String? @db.VarChar(255) @map("imagen_url")
+  idSerie     Int     @map("id_serie")
+  serie       Serie   @relation(fields: [idSerie], references: [id])
+
+  @@map("temporada")
 }
