@@ -5,13 +5,14 @@ import { authLimiter, generalLimiter } from "../middlewares/rateLimit";
 const router = Router();
 
 const SERVICES = {
-  auth:     process.env.AUTH_SERVICE_URL    || "http://localhost:3001",
-  user:     process.env.USER_SERVICE_URL    || "http://localhost:3002",
-  series:   process.env.SERIES_SERVICE_URL  || "http://localhost:3003",
-  seasons:  process.env.SEASON_SERVICE_URL  || "http://localhost:3004",
+  auth:     process.env.AUTH_SERVICE_URL || "http://localhost:3001",
+  user:     process.env.USER_SERVICE_URL || "http://localhost:3002",
+  series:   process.env.SERIES_SERVICE_URL || "http://localhost:3003",
+  seasons:  process.env.SEASON_SERVICE_URL || "http://localhost:3004",
   episodes: process.env.EPISODE_SERVICE_URL || "http://localhost:3005",
-  reviews:  process.env.REVIEW_SERVICE_URL  || "http://localhost:3006",
+  reviews:  process.env.REVIEW_SERVICE_URL || "http://localhost:3006",
   comments: process.env.COMMENT_SERVICE_URL || "http://localhost:3007",
+  realtime: process.env.REALTIME_SERVICE_URL || "http://localhost:3008",
 };
 
 router.use("/auth", authLimiter, proxy(SERVICES.auth, {
@@ -40,6 +41,10 @@ router.use("/reviews", generalLimiter, proxy(SERVICES.reviews, {
 
 router.use("/comments", generalLimiter, proxy(SERVICES.comments, {
   proxyReqPathResolver: (req) => `/comments${req.url}`
+}));
+
+router.use("/realtime", generalLimiter, proxy(SERVICES.realtime, {
+  proxyReqPathResolver: (req) => `/realtime${req.url}`
 }));
 
 // ── Health check ───────────────────────────────────────
