@@ -1,34 +1,48 @@
 import { Router, Request, Response } from "express";
-import { createProxyMiddleware } from "http-proxy-middleware";
+import proxy from "express-http-proxy";
 import { authLimiter, generalLimiter } from "../middlewares/rateLimit";
 
 const router = Router();
 
 const SERVICES = {
-  auth:    process.env.AUTH_SERVICE_URL    || "http://localhost:3001",
-  user:    process.env.USER_SERVICE_URL    || "http://localhost:3002",
-  series:  process.env.SERIES_SERVICE_URL  || "http://localhost:3003",
-  seasons: process.env.SEASON_SERVICE_URL  || "http://localhost:3004",
-  episodes:process.env.EPISODE_SERVICE_URL || "http://localhost:3005",
-  reviews: process.env.REVIEW_SERVICE_URL  || "http://localhost:3006",
-  comments:process.env.COMMENT_SERVICE_URL || "http://localhost:3007",
+  auth:     process.env.AUTH_SERVICE_URL    || "http://localhost:3001",
+  user:     process.env.USER_SERVICE_URL    || "http://localhost:3002",
+  series:   process.env.SERIES_SERVICE_URL  || "http://localhost:3003",
+  seasons:  process.env.SEASON_SERVICE_URL  || "http://localhost:3004",
+  episodes: process.env.EPISODE_SERVICE_URL || "http://localhost:3005",
+  reviews:  process.env.REVIEW_SERVICE_URL  || "http://localhost:3006",
+  comments: process.env.COMMENT_SERVICE_URL || "http://localhost:3007",
 };
 
-const proxy = (target: string) =>
-  createProxyMiddleware({ target, changeOrigin: true });
+router.use("/auth", authLimiter, proxy(SERVICES.auth, {
+  proxyReqPathResolver: (req) => `/auth${req.url}`
+}));
 
-// ── Auth (con rate limit estricto) ─────────────────────
-router.use("/auth", authLimiter, proxy(SERVICES.auth));
+router.use("/users", generalLimiter, proxy(SERVICES.user, {
+  proxyReqPathResolver: (req) => `/users${req.url}`
+}));
 
-// ── Servicios con rate limit general ──────────────────
-router.use("/users",    generalLimiter, proxy(SERVICES.user));
-router.use("/series",   generalLimiter, proxy(SERVICES.series));
-router.use("/seasons",  generalLimiter, proxy(SERVICES.seasons));
-router.use("/episodes", generalLimiter, proxy(SERVICES.episodes));
-router.use("/reviews",  generalLimiter, proxy(SERVICES.reviews));
-router.use("/comments", generalLimiter, proxy(SERVICES.comments));
+router.use("/series", generalLimiter, proxy(SERVICES.series, {
+  proxyReqPathResolver: (req) => `/series${req.url}`
+}));
 
-// ── Health check de todos los servicios ───────────────
+router.use("/seasons", generalLimiter, proxy(SERVICES.seasons, {
+  proxyReqPathResolver: (req) => `/seasons${req.url}`
+}));
+
+router.use("/episodes", generalLimiter, proxy(SERVICES.episodes, {
+  proxyReqPathResolver: (req) => `/episodes${req.url}`
+}));
+
+router.use("/reviews", generalLimiter, proxy(SERVICES.reviews, {
+  proxyReqPathResolver: (req) => `/reviews${req.url}`
+}));
+
+router.use("/comments", generalLimiter, proxy(SERVICES.comments, {
+  proxyReqPathResolver: (req) => `/comments${req.url}`
+}));
+
+// ── Health check ───────────────────────────────────────
 router.get("/health", async (_req: Request, res: Response) => {
   const checks = await Promise.allSettled(
     Object.entries(SERVICES).map(async ([name, url]) => {
