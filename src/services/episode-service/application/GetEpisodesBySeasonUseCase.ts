@@ -24,7 +24,6 @@ export class ImportEpisodesFromTmdbUseCase {
   }
 
   async execute(idTemporada: number): Promise<Episode[]> {
-    // 1. Buscar la temporada en DB para obtener número y tmdbId de la serie
     const temporada = await prisma.temporada.findUnique({
       where: { id: idTemporada },
       include: { serie: true },
@@ -35,7 +34,6 @@ export class ImportEpisodesFromTmdbUseCase {
       throw new Error("La serie no tiene tmdbId, fue agregada manualmente");
     }
 
-    // 2. Verificar si ya tiene episodios importados
     const existentes = await prisma.capitulo.findMany({ where: { idTemporada } });
     if (existentes.length > 0) {
       return existentes.map(
@@ -43,7 +41,6 @@ export class ImportEpisodesFromTmdbUseCase {
       );
     }
 
-    // 3. Obtener episodios desde TMDB
     const response = await fetch(
       `${TMDB_BASE}/tv/${temporada.serie.tmdbId}/season/${temporada.numero}?api_key=${this.apiKey}&language=es-MX`
     );
@@ -57,7 +54,6 @@ export class ImportEpisodesFromTmdbUseCase {
       }[];
     };
 
-    // 4. Guardar episodios en DB
     const episodios: Episode[] = [];
     for (const e of data.episodes) {
       const capitulo = await prisma.capitulo.create({

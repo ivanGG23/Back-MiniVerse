@@ -6,12 +6,10 @@ import { Response } from "express";
 const router = Router();
 const reviewController = new ReviewController();
 
-// Públicas
 router.get("/episode/:idCapitulo", (req, res) =>
   reviewController.getByEpisode(req, res)
 );
 
-// Protegidas
 router.get("/me", jwtMiddleware, (req, res) =>
   reviewController.getMyReviews(req as AuthRequest, res as Response)
 );

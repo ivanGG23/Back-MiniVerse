@@ -6,12 +6,10 @@ import { Response } from "express";
 const router = Router();
 const commentController = new CommentController();
 
-// Públicas
 router.get("/review/:idResena", (req, res) =>
   commentController.getByReview(req, res)
 );
 
-// Protegidas
 router.post("/", jwtMiddleware, (req, res) =>
   commentController.create(req as AuthRequest, res as Response)
 );

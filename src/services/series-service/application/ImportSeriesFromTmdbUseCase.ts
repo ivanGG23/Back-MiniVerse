@@ -16,7 +16,6 @@ export class ImportSeriesFromTmdbUseCase {
   }
 
   async execute(tmdbId: number): Promise<Series> {
-    // 1. Verificar si la serie ya existe en DB
     const existente = await prisma.serie.findFirst({
       where: { tmdbId },
     });
@@ -32,7 +31,6 @@ export class ImportSeriesFromTmdbUseCase {
       );
     }
 
-    // 2. Obtener detalles completos de la serie desde TMDB
     const response = await fetch(
       `${TMDB_BASE}/tv/${tmdbId}?api_key=${this.apiKey}&language=es-MX`
     );
@@ -55,7 +53,6 @@ export class ImportSeriesFromTmdbUseCase {
       throw new Error("La serie no tiene sinopsis disponible");
     }
 
-    // 3. Upsert del género principal
     const generoNombre = data.genres[0]?.name ?? "Desconocido";
     const genero = await prisma.genero.upsert({
       where: { nombre: generoNombre },
@@ -63,7 +60,6 @@ export class ImportSeriesFromTmdbUseCase {
       create: { nombre: generoNombre },
     });
 
-    // 4. Upsert del director/creador
     const directorNombre = data.created_by[0]?.name ?? "Desconocido";
     const director = await prisma.director.upsert({
       where: { nombre: directorNombre },
@@ -79,7 +75,6 @@ export class ImportSeriesFromTmdbUseCase {
       ? `${TMDB_IMAGE}${data.poster_path}`
       : null;
 
-    // 5. Guardar serie en DB
     const serie = await prisma.serie.create({
       data: {
         tmdbId: data.id,

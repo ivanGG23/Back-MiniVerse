@@ -14,7 +14,7 @@ app.get("/health", (_req, res) => {
 app.use("/series", seriesRoutes);
 
 app.listen(PORT, () => {
-  console.log(`🎬 series-service corriendo en puerto ${PORT}`);
+  console.log(` series-service corriendo en puerto ${PORT}`);
 });
 
 export default app;

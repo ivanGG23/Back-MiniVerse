@@ -38,7 +38,6 @@ export class SearchSeriesUseCase {
       }[];
     };
 
-    // Obtener géneros para mapear ids a nombres
     const generosRes = await fetch(
       `${TMDB_BASE}/genre/tv/list?api_key=${this.apiKey}&language=es-MX`
     );

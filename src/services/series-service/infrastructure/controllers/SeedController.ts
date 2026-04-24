@@ -14,14 +14,12 @@ export class SeedController {
                 return;
             }
 
-            // 1. Obtener géneros de TMDB y sincronizar con DB
             const generosRes = await fetch(
                 `${TMDB_BASE}/genre/tv/list?api_key=${TMDB_API_KEY}&language=es-MX`
             );
             const generosData = (await generosRes.json()) as { genres: { id: number; name: string }[] };
 
-            const generosMap = new Map<number, number>(); // tmdbId -> dbId
-
+            const generosMap = new Map<number, number>();
             for (const g of generosData.genres) {
                 const genero = await prisma.genero.upsert({
                     where: { nombre: g.name },
@@ -31,14 +29,12 @@ export class SeedController {
                 generosMap.set(g.id, genero.id);
             }
 
-            // 2. Obtener director genérico para series sin director específico
             const directorDefault = await prisma.director.upsert({
                 where: { nombre: "Desconocido" },
                 update: {},
                 create: { nombre: "Desconocido", biografia: "Director no especificado" },
             });
 
-            // 3. Obtener series populares de TMDB (3 páginas = ~60 series)
             let seriesInsertadas = 0;
             let seriesOmitidas = 0;
 
@@ -58,7 +54,6 @@ export class SeedController {
                 };
 
                 for (const s of seriesData.results) {
-                    // Omitir series sin sinopsis
                     if (!s.overview) {
                         seriesOmitidas++;
                         continue;
@@ -68,7 +63,6 @@ export class SeedController {
                         ? parseInt(s.first_air_date.split("-")[0])
                         : 0;
 
-                    // Tomar el primer género disponible
                     const idGeneroTmdb = s.genre_ids[0];
                     const idGenero = idGeneroTmdb
                         ? (generosMap.get(idGeneroTmdb) ?? directorDefault.id)
@@ -78,7 +72,6 @@ export class SeedController {
                         ? `${TMDB_IMAGE}${s.poster_path}`
                         : null;
 
-                    // Upsert para no duplicar si se corre más de una vez
                     const existe = await prisma.serie.findFirst({
                         where: { nombre: s.name },
                     });

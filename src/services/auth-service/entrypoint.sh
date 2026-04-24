@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-echo "⏳ Corriendo migraciones de Prisma..."
+echo " Corriendo migraciones de Prisma..."
 npx prisma migrate deploy
 
-echo "✅ Migraciones aplicadas. Levantando servicio..."
+echo " Migraciones aplicadas. Levantando servicio..."
 exec node dist/main.js

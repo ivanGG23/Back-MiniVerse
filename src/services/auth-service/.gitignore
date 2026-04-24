@@ -2,6 +2,6 @@ node_modules/
 dist/
 .env
 
-# Claves RS256 — NUNCA subir al repositorio
+
 src/shared/security/keys/private.key
 src/shared/security/keys/public.key

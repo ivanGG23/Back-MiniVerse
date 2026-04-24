@@ -7,12 +7,10 @@ const PORT = process.env.USER_SERVICE_PORT || 3002;
 
 app.use(express.json());
 
-// Health check
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "user-service" });
 });
 
-// Routes
 app.use("/users", userRoutes);
 
 app.listen(PORT, () => {

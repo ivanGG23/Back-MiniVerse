@@ -15,10 +15,8 @@ export class CreateCommentUseCase {
       throw new Error("El comentario debe tener al menos 2 caracteres");
     }
 
-    // 1. Guardar en DB
     const comentario = await this.commentRepository.create(data);
 
-    // 2. Notificar al realtime-service (sin bloquear la respuesta)
     fetch(`${REALTIME_SERVICE_URL}/emit/comment`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

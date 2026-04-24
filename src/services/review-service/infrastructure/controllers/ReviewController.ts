@@ -11,7 +11,6 @@ const getByUserUseCase = new GetReviewsByUserUseCase(repository);
 const deleteReviewUseCase = new DeleteReviewUseCase(repository);
 
 export class ReviewController {
-  // GET /reviews/episode/:idCapitulo
   async getByEpisode(req: Request, res: Response): Promise<void> {
     try {
       const idCapitulo = parseInt(req.params.idCapitulo);
@@ -22,7 +21,6 @@ export class ReviewController {
     }
   }
 
-  // GET /reviews/me (reseñas del usuario autenticado)
   async getMyReviews(req: AuthRequest, res: Response): Promise<void> {
     try {
       const idUsuario = req.usuario!.id;
@@ -33,7 +31,6 @@ export class ReviewController {
     }
   }
 
-  // POST /reviews
   async create(req: AuthRequest, res: Response): Promise<void> {
     try {
       const idUsuario = req.usuario!.id;
@@ -49,7 +46,6 @@ export class ReviewController {
     }
   }
 
-  // DELETE /reviews/:id
   async delete(req: AuthRequest, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id);
