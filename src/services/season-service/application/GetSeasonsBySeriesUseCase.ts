@@ -10,7 +10,18 @@ export class GetSeasonsBySeriesUseCase {
   constructor(private readonly seasonRepository: ISeasonRepository) {}
 
   async execute(idSerie: number): Promise<Season[]> {
-    return this.seasonRepository.findBySerie(idSerie);
+    const temporadas = await this.seasonRepository.findBySerie(idSerie)
+
+    if (temporadas.length === 0) {
+      const importar = new ImportSeasonsFromTmdbUseCase()
+      try {
+        return await importar.execute(idSerie)
+      } catch {
+        return []
+      }
+    }
+
+    return temporadas
   }
 }
 
