@@ -3,7 +3,7 @@ import express from "express";
 import seriesRoutes from "./infrastructure/routes/Routes";
 
 const app = express();
-const PORT = process.env.SERIES_SERVICE_PORT || 3003;
+const PORT = process.env.PORT || 3003;
 
 app.use(express.json());
 
@@ -14,7 +14,7 @@ app.get("/health", (_req, res) => {
 app.use("/series", seriesRoutes);
 
 app.listen(PORT, () => {
-  console.log(series-service corriendo en puerto ${PORT});
+  console.log(`🎬 series-service corriendo en puerto ${PORT}`);
 });
 
 export default app;
