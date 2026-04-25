@@ -9,7 +9,18 @@ export class GetEpisodesBySeasonUseCase {
   constructor(private readonly episodeRepository: IEpisodeRepository) {}
 
   async execute(idTemporada: number): Promise<Episode[]> {
-    return this.episodeRepository.findBySeason(idTemporada);
+    const episodios = await this.episodeRepository.findBySeason(idTemporada)
+
+    if (episodios.length === 0) {
+      const importar = new ImportEpisodesFromTmdbUseCase()
+      try {
+        return await importar.execute(idTemporada)
+      } catch {
+        return []
+      }
+    }
+
+    return episodios
   }
 }
 
