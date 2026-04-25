@@ -4,7 +4,7 @@ import cors from "cors";
 import routes from "./routes/Routes";
 
 const app = express();
-const PORT = process.env.GATEWAY_PORT || 3100;
+const PORT = process.env.PORT || 3100;
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:3000",

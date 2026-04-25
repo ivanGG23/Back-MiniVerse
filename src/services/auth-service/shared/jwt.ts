@@ -2,14 +2,13 @@ import jwt from "jsonwebtoken";
 import fs from "fs";
 import path from "path";
 
-const privateKey = fs.readFileSync(
-    path.join(__dirname, "keys/private.key"),
-    "utf8"
-);
-const publicKey = fs.readFileSync(
-    path.join(__dirname, "keys/public.key"),
-    "utf8"
-);
+const privateKey = process.env.JWT_PRIVATE_KEY
+    ? process.env.JWT_PRIVATE_KEY.replace(/\\n/g, '\n')
+    : fs.readFileSync(path.join(__dirname, "keys/private.key"), "utf8")
+
+const publicKey = process.env.JWT_PUBLIC_KEY
+    ? process.env.JWT_PUBLIC_KEY.replace(/\\n/g, '\n')
+    : fs.readFileSync(path.join(__dirname, "keys/public.key"), "utf8")
 
 export function generateToken(payload: object): string {
     return jwt.sign(payload, privateKey, {

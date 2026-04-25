@@ -3,7 +3,7 @@ import express from "express";
 import episodeRoutes from "./infrastructure/routes/Routes";
 
 const app = express();
-const PORT = process.env.EPISODE_SERVICE_PORT || 3005;
+const PORT = process.env.PORT || 3005;
 
 app.use(express.json());
 

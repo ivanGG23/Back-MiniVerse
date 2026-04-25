@@ -3,7 +3,7 @@ import express from "express";
 import commentRoutes from "./infrastructure/routes/Routes";
 
 const app = express();
-const PORT = process.env.COMMENT_SERVICE_PORT || 3007;
+const PORT = process.env.PORT || 3007;
 
 app.use(express.json());
 

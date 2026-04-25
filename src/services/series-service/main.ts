@@ -3,7 +3,7 @@ import express from "express";
 import seriesRoutes from "./infrastructure/routes/Routes";
 
 const app = express();
-const PORT = process.env.SERIES_SERVICE_PORT || 3003;
+const PORT = process.env.PORT || 3003;
 
 app.use(express.json());
 

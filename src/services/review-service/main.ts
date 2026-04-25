@@ -3,7 +3,7 @@ import express from "express";
 import reviewRoutes from "./infrastructure/routes/Routes";
 
 const app = express();
-const PORT = process.env.REVIEW_SERVICE_PORT || 3006;
+const PORT = process.env.PORT || 3006;
 
 app.use(express.json());
 

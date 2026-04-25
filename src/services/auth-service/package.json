@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "MiniVerse backend - plataforma de reseñas de series por episodio",
   "scripts": {
-    "dev:auth": "ts-node-dev --respawn main.ts",
+    "dev": "ts-node-dev --respawn main.ts",
     "build": "tsc",
+    "start": "node dist/main.ts",
     "prisma:generate": "prisma generate --schema=src/auth-service/infrastructure/prisma/schema.prisma",
     "prisma:migrate": "prisma migrate dev --schema=src/auth-service/infrastructure/prisma/schema.prisma",
     "prisma:push": "prisma db push --schema=src/auth-service/infrastructure/prisma/schema.prisma",

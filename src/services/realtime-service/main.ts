@@ -9,16 +9,15 @@ import cors from "cors";
 
 const app = express();
 const httpServer = createServer(app);
-const PORT = process.env.REALTIME_SERVICE_PORT || 3008;
+const PORT = process.env.PORT || 3008;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 app.use(cors({ origin: FRONTEND_URL, credentials: true }));
 app.use(express.json());
 
-const publicKey = fs.readFileSync(
-  path.join(__dirname, "shared/keys/public.key"),
-  "utf8"
-);
+const publicKey = process.env.JWT_PUBLIC_KEY
+  ? process.env.JWT_PUBLIC_KEY.replace(/\\n/g, '\n')
+  : fs.readFileSync(path.join(__dirname, "shared/keys/public.key"), "utf8")
 
 const io = new Server(httpServer, {
   cors: {

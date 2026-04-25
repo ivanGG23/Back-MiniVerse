@@ -3,7 +3,7 @@ import express from "express";
 import seasonRoutes from "./infrastructure/routes/Routes";
 
 const app = express();
-const PORT = process.env.SEASON_SERVICE_PORT || 3004;
+const PORT = process.env.PORT || 3004;
 
 app.use(express.json());
 
