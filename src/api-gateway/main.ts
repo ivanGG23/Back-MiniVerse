@@ -11,6 +11,10 @@ app.use(cors({
   credentials: true,
 }));
 
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok", service: "api-gateway" });
+});
+
 app.use(express.json());
 
 app.use("/api", routes);
