@@ -66,4 +66,17 @@ router.get("/health", async (_req: Request, res: Response) => {
   res.json({ gateway: "up", services: results });
 });
 
+// ── Wake up services (anti-sleep Render) ─────────────────
+router.get("/wake-up", async (_req: Request, res: Response) => {
+  const urls = Object.values(SERVICES);
+
+  await Promise.allSettled(
+    urls.map((url) =>
+      fetch(`${url}/health`).catch(() => null)
+    )
+  );
+
+  res.json({ message: "Servicios despertados" });
+});
+
 export default router;
