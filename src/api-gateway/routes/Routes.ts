@@ -68,15 +68,36 @@ router.get("/health", async (_req: Request, res: Response) => {
 
 // ── Wake up services (anti-sleep Render) ─────────────────
 router.get("/wake-up", async (_req: Request, res: Response) => {
-  const urls = Object.values(SERVICES);
+  const results = await Promise.allSettled(
+    Object.entries(SERVICES).map(async ([name, url]) => {
+      const start = Date.now();
 
-  await Promise.allSettled(
-    urls.map((url) =>
-      fetch(`${url}/health`).catch(() => null)
-    )
+      try {
+        const response = await fetch(`${url}/health`);
+        const time = Date.now() - start;
+
+        if (!response.ok) {
+          return { name, status: "error", time };
+        }
+
+        return { name, status: "up", time };
+      } catch (error) {
+        const time = Date.now() - start;
+        return { name, status: "down", time };
+      }
+    })
   );
 
-  res.json({ message: "Servicios despertados" });
+  const formatted = results.map((r) =>
+    r.status === "fulfilled"
+      ? r.value
+      : { name: "unknown", status: "down", time: 0 }
+  );
+
+  res.json({
+    message: "Wake-up ejecutado 🚀",
+    services: formatted
+  });
 });
 
 export default router;
