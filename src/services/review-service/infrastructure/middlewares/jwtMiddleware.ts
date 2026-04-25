@@ -3,10 +3,9 @@ import jwt from "jsonwebtoken";
 import fs from "fs";
 import path from "path";
 
-const publicKey = fs.readFileSync(
-  path.join(__dirname, "../../shared/keys/public.key"),
-  "utf8"
-);
+const publicKey = process.env.JWT_PUBLIC_KEY
+  ? process.env.JWT_PUBLIC_KEY.replace(/\\n/g, '\n')
+  : fs.readFileSync(path.join(__dirname, "../../shared/keys/public.key"), "utf8")
 
 export interface AuthRequest extends Request {
   usuario?: { id: number; correo: string };
