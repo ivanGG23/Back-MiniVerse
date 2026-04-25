@@ -15,13 +15,11 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 app.use(cors({ origin: FRONTEND_URL, credentials: true }));
 app.use(express.json());
 
-// Leer clave pública para validar JWT
 const publicKey = fs.readFileSync(
   path.join(__dirname, "shared/keys/public.key"),
   "utf8"
 );
 
-// Configurar Socket.io
 const io = new Server(httpServer, {
   cors: {
     origin: FRONTEND_URL,
@@ -29,7 +27,7 @@ const io = new Server(httpServer, {
   },
 });
 
-// ── Middleware de autenticación para Socket.io ─────────
+// Middleware de autenticacion para Socket.io
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
   if (!token) {
@@ -42,37 +40,47 @@ io.use((socket, next) => {
     socket.data.usuario = payload;
     next();
   } catch {
-    next(new Error("Token inválido o expirado"));
+    next(new Error("Token invalido o expirado"));
   }
 });
 
-// ── Eventos de Socket.io ───────────────────────────────
+// Eventos de Socket.io
 io.on("connection", (socket) => {
   const usuario = socket.data.usuario;
-  console.log(`✅ Usuario conectado: ${usuario.correo} (socket: ${socket.id})`);
+  console.log(`Usuario conectado: ${usuario.correo} (socket: ${socket.id})`);
 
-  // Unirse a la sala de una reseña específica
-  // El frontend emite: socket.emit("join:review", { idResena: 1 })
+  // Sala por resena (comentarios en tiempo real)
   socket.on("join:review", ({ idResena }: { idResena: number }) => {
     const room = `review:${idResena}`;
     socket.join(room);
-    console.log(`👤 ${usuario.correo} se unió a la sala ${room}`);
+    console.log(`${usuario.correo} se unio a la sala ${room}`);
   });
 
-  // Salir de la sala de una reseña
   socket.on("leave:review", ({ idResena }: { idResena: number }) => {
     const room = `review:${idResena}`;
     socket.leave(room);
-    console.log(`👤 ${usuario.correo} salió de la sala ${room}`);
+    console.log(`${usuario.correo} salio de la sala ${room}`);
+  });
+
+  // Sala por episodio (resenas en tiempo real)
+  socket.on("join:episode", ({ idCapitulo }: { idCapitulo: number }) => {
+    const room = `episode:${idCapitulo}`;
+    socket.join(room);
+    console.log(`${usuario.correo} se unio a la sala ${room}`);
+  });
+
+  socket.on("leave:episode", ({ idCapitulo }: { idCapitulo: number }) => {
+    const room = `episode:${idCapitulo}`;
+    socket.leave(room);
+    console.log(`${usuario.correo} salio de la sala ${room}`);
   });
 
   socket.on("disconnect", () => {
-    console.log(`❌ Usuario desconectado: ${usuario.correo}`);
+    console.log(`Usuario desconectado: ${usuario.correo}`);
   });
 });
 
-// ── Endpoint interno para emitir comentarios nuevos ───
-// El comment-service llama a este endpoint cuando crea un comentario
+// Endpoint interno para emitir comentarios nuevos
 app.post("/emit/comment", (req, res) => {
   const { idResena, comentario } = req.body;
 
@@ -84,11 +92,27 @@ app.post("/emit/comment", (req, res) => {
   const room = `review:${idResena}`;
   io.to(room).emit("new:comment", comentario);
 
-  console.log(`📢 Comentario emitido a sala ${room}`);
+  console.log(`Comentario emitido a sala ${room}`);
   res.status(200).json({ mensaje: "Comentario emitido correctamente" });
 });
 
-// ── Health check ───────────────────────────────────────
+// Endpoint interno para emitir resenas nuevas
+app.post("/emit/review", (req, res) => {
+  const { idCapitulo, resena } = req.body;
+
+  if (!idCapitulo || !resena) {
+    res.status(400).json({ error: "idCapitulo y resena son requeridos" });
+    return;
+  }
+
+  const room = `episode:${idCapitulo}`;
+  io.to(room).emit("new:review", resena);
+
+  console.log(`Resena emitida a sala ${room}`);
+  res.status(200).json({ mensaje: "Resena emitida correctamente" });
+});
+
+// Health check
 app.get("/health", (_req, res) => {
   res.json({
     status: "ok",
@@ -98,7 +122,7 @@ app.get("/health", (_req, res) => {
 });
 
 httpServer.listen(PORT, () => {
-  console.log(`⚡ realtime-service corriendo en puerto ${PORT}`);
+  console.log(`realtime-service corriendo en puerto ${PORT}`);
 });
 
 export default app;
