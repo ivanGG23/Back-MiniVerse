@@ -86,6 +86,7 @@ export class SeedController {
                     if (!existe) {
                         await prisma.serie.create({
                             data: {
+                                tmdbId: s.id,
                                 nombre: s.name,
                                 estreno,
                                 sinopsis: s.overview,
